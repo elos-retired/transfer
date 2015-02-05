@@ -2,7 +2,7 @@ package transfer
 
 import (
 	"github.com/elos/data"
-	"github.com/elos/server/util"
+	"github.com/elos/stack/util"
 )
 
 type Router interface {
