@@ -2,7 +2,6 @@ package transfer
 
 import (
 	"github.com/elos/data"
-	"github.com/elos/stack/util"
 )
 
 type Router interface {
@@ -30,17 +29,17 @@ func (r *ActionRouter) Route(e *Envelope, s data.Store) {
 	// Defaults
 	switch e.Action {
 	case POST:
-		go PostHandler(e, s)
+		go post(e, s)
 	case GET:
-		go GetHandler(e, s)
+		go get(e, s)
 	case DELETE:
-		go DeleteHandler(e, s)
+		go del(e, s)
 	case SYNC:
-		go SyncHandler(e, s)
+		go syn(e, s)
 	case ECHO:
-		go EchoHandler(e, s)
+		go echo(e, s)
 	default:
-		go e.Connection.WriteJSON(util.NewInvalidMethodError())
+		go e.Connection.WriteJSON(NewInvalidMethodError())
 	}
 }
 

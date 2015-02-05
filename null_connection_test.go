@@ -6,8 +6,8 @@ import (
 
 	"errors"
 
-	"github.com/elos/server/models"
-	"github.com/elos/server/models/user"
+	"github.com/elos/models"
+	"github.com/elos/models/user"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

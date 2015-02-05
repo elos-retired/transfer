@@ -2,7 +2,7 @@ package transfer_test
 
 import (
 	"github.com/elos/data"
-	"github.com/elos/server/models/user"
+	"github.com/elos/models/user"
 	. "github.com/elos/transfer"
 
 	"errors"
@@ -28,7 +28,7 @@ var _ = Describe("WebSocket", func() {
 	Describe("NullUpgrader", func() {
 		var (
 			a data.Identifiable
-			c Connection
+			c *NullConnection
 			u *NullUpgrader
 
 			w http.ResponseWriter

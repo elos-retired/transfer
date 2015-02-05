@@ -1,7 +1,6 @@
 package transfer
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -38,9 +37,4 @@ func (c *HTTPConnection) WriteJSON(v interface{}) error {
 
 func (c *HTTPConnection) Agent() data.Identifiable {
 	return c.a
-}
-
-func ToJSON(v interface{}) ([]byte, error) {
-	// Always pretty-print JSON
-	return json.MarshalIndent(v, "", "    ")
 }

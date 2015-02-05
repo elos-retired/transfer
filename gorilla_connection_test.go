@@ -2,8 +2,8 @@ package transfer_test
 
 import (
 	"github.com/elos/data"
-	"github.com/elos/server/models"
-	"github.com/elos/server/models/user"
+	"github.com/elos/models"
+	"github.com/elos/models/user"
 	. "github.com/elos/transfer"
 
 	"errors"
@@ -16,7 +16,7 @@ var _ = Describe("GorillaConnection", func() {
 	var (
 		u  models.User
 		c  *NullConnection
-		gc Connection
+		gc SocketConnection
 	)
 
 	JustBeforeEach(func() {
