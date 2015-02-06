@@ -2,7 +2,7 @@ package transfer
 
 import (
 	"github.com/elos/data"
-	"github.com/gorilla/websocket"
+	gorilla "github.com/gorilla/websocket"
 	"net/http"
 	"sync"
 )
@@ -62,11 +62,12 @@ func (u *NullUpgrader) SetError(e error) {
 // Gorilla Upgrader {{{
 // wrapper for gorillla upgrader
 type GorillaUpgrader struct {
-	Upgrader *websocket.Upgrader
+	Upgrader *gorilla.Upgrader
 }
 
 func (u *GorillaUpgrader) Upgrade(w http.ResponseWriter, r *http.Request, a data.Identifiable) (SocketConnection, error) {
 	wc, err := u.Upgrader.Upgrade(w, r, ExtractProtocolHeader(r))
+
 	if err != nil {
 		return NewNullConnection(a), err
 	}
@@ -75,7 +76,7 @@ func (u *GorillaUpgrader) Upgrade(w http.ResponseWriter, r *http.Request, a data
 }
 
 func NewGorillaUpgrader(rbs int, wbs int, checkO bool) *GorillaUpgrader {
-	u := &websocket.Upgrader{
+	u := &gorilla.Upgrader{
 		ReadBufferSize:  rbs,
 		WriteBufferSize: wbs,
 		CheckOrigin: func(r *http.Request) bool {
