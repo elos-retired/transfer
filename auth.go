@@ -17,12 +17,19 @@ var Auth = func(extract func(*http.Request) (string, string)) Authenticator {
 		if id == "" || key == "" {
 			return nil, false, nil
 		}
+
 		return user.Authenticate(s, id, key)
 	}
 }
 
 var HTTPCredentials = func(r *http.Request) (string, string) {
-	return "", ""
+	tokens := strings.Split(r.Header.Get("Elos-Auth"), "-")
+
+	if len(tokens) != 2 {
+		return "", ""
+	} else {
+		return tokens[0], tokens[1]
+	}
 }
 
 var SocketCredentials = func(r *http.Request) (string, string) {
