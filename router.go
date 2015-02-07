@@ -5,7 +5,7 @@ import (
 )
 
 type Router interface {
-	Route(e *Envelope, s data.Store)
+	Route(e *Envelope, s *data.Access)
 }
 
 type ActionRouter struct {
@@ -18,33 +18,33 @@ func NewActionRouter() *ActionRouter {
 	}
 }
 
-func (r *ActionRouter) Route(e *Envelope, s data.Store) {
+func (r *ActionRouter) Route(e *Envelope, a *data.Access) {
 	// Overrides
 	router, ok := r.actions[e.Action]
 	if ok {
-		go router.Route(e, s)
+		go router.Route(e, a)
 		return
 	}
 
 	// Defaults
 	switch e.Action {
 	case POST:
-		go post(e, s)
+		go PostRoute(e, a)
 	case GET:
-		go get(e, s)
+		go GetRoute(e, a)
 	case DELETE:
-		go del(e, s)
+		go DeleteRoute(e, a)
 	case SYNC:
-		go synchronize(e, s)
+		go SyncRoute(e, a)
 	case ECHO:
-		go echo(e, s)
+		go EchoRoute(e, a)
 	default:
-		go e.Connection.WriteJSON(NewInvalidMethodError())
+		go NoActionRoute(e)
 	}
 }
 
 var DefaultRouter = NewActionRouter()
 
-func Route(e *Envelope, s data.Store) {
-	DefaultRouter.Route(e, s)
+func Route(e *Envelope, a *data.Access) {
+	DefaultRouter.Route(e, a)
 }

@@ -4,25 +4,28 @@ import "github.com/elos/data"
 
 // GET {{{
 
-func get(e *Envelope, s data.Store) {
-	// kind is s.Kind
-	// info is map[string]interface{}
+var GetRoute = func(e *Envelope, a *data.Access) {
 	for kind, info := range e.Data {
-		m, _ := s.Unmarshal(kind, info)
-
-		err := s.PopulateByID(m)
-
+		m, err := a.Unmarshal(kind, info)
 		if err != nil {
-			if err == data.ErrNotFound {
-				e.Connection.WriteJSON(APIError{404, 404, "Not Found", "Bad id?"})
-				return
-			}
-			// Otherwise we don't know
-			e.Connection.WriteJSON(APIError{400, 400, "Oh shit", ""})
+			e.WriteJSON(ErrGeneric)
 			return
 		}
 
-		e.Connection.WriteJSON(m)
+		if err = a.PopulateByID(m); err != nil {
+			switch err {
+			case data.ErrAccessDenial:
+				e.WriteJSON(ErrAccess)
+			case data.ErrNotFound:
+				e.WriteJSON(ErrNotFound)
+			default:
+				e.WriteJSON(ErrGeneric)
+			}
+
+			return
+		}
+
+		e.WriteJSON(NewPackage(POST, data.Map(m)))
 	}
 }
 
@@ -30,32 +33,29 @@ func get(e *Envelope, s data.Store) {
 
 // POST {{{
 
-func post(e *Envelope, s data.Store) {
-	var (
-		kind  data.Kind
-		attrs data.AttrMap
-	)
-
-	for kind, attrs = range e.Data {
-		m, err := s.Unmarshal(kind, attrs)
-
+var PostRoute = func(e *Envelope, a *data.Access) {
+	for kind, attrs := range e.Data {
+		m, err := a.Unmarshal(kind, attrs)
 		if err != nil {
-			e.Connection.WriteJSON(APIError{400, 400, "Error", "error"})
+			e.WriteJSON(ErrGeneric)
 			return
 		}
 
 		if !m.ID().Valid() {
-			m.SetID(s.NewID())
+			m.SetID(a.Store.NewID())
 		}
 
-		err = s.Save(m)
-
-		if err != nil {
-			e.Connection.WriteJSON(APIError{400, 400, "Error saving the model", "Check yoself"})
+		if err = a.Save(m); err != nil {
+			switch err {
+			case data.ErrAccessDenial:
+				e.WriteJSON(ErrAccess)
+			default:
+				e.WriteJSON(ErrGeneric)
+			}
 			return
 		}
 
-		e.Connection.WriteJSON(m)
+		e.WriteJSON(NewPackage(POST, data.Map(m)))
 	}
 }
 
@@ -72,19 +72,26 @@ func post(e *Envelope, s data.Store) {
 	Unsuccessful removal prompts a direct POST response
 	containing the record in question
 */
-func del(e *Envelope, s data.Store) {
-	var (
-		kind data.Kind
-		info data.AttrMap
-	)
-
-	for kind, info = range e.Data {
-		m, err := s.Unmarshal(kind, info)
+var DeleteRoute = func(e *Envelope, a *data.Access) {
+	for kind, info := range e.Data {
+		m, err := a.Unmarshal(kind, info)
 		if err != nil {
+			e.WriteJSON(ErrGeneric)
 			return
 		}
 
-		e.Connection.WriteJSON(NewPackage(DELETE, data.Map(m)))
+		if err = a.Delete(m); err != nil {
+			switch err {
+			case data.ErrAccessDenial:
+				e.WriteJSON(ErrAccess)
+			default:
+				e.WriteJSON(ErrGeneric)
+			}
+
+			return
+		}
+
+		e.WriteJSON(NewPackage(DELETE, data.Map(m)))
 	}
 }
 
@@ -92,16 +99,24 @@ func del(e *Envelope, s data.Store) {
 
 // ECHO {{{
 
-func echo(e *Envelope, db data.DB) {
-	e.Connection.WriteJSON(e)
+var EchoRoute = func(e *Envelope, a *data.Access) {
+	e.WriteJSON(e)
 }
 
 // ECHO }}}
 
 // SYNC {{{
 
-func synchronize(e *Envelope, db data.DB) {
+var SyncRoute = func(e *Envelope, a *data.Access) {
 	// not implemented
 }
 
 // SYNC }}}
+
+// NoActon {{{
+
+var NoActionRoute = func(e *Envelope) {
+	e.WriteJSON(ErrBadMethod)
+}
+
+// NoActon }}}
