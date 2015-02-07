@@ -84,7 +84,7 @@ func del(e *Envelope, s data.Store) {
 			return
 		}
 
-		e.Connection.WriteJSON(NewPackage(DELETE, Map(m)))
+		e.Connection.WriteJSON(NewPackage(DELETE, data.Map(m)))
 	}
 }
 
@@ -100,7 +100,7 @@ func echo(e *Envelope, db data.DB) {
 
 // SYNC {{{
 
-func syn(e *Envelope, db data.DB) {
+func synchronize(e *Envelope, db data.DB) {
 	// not implemented
 }
 

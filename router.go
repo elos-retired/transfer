@@ -35,7 +35,7 @@ func (r *ActionRouter) Route(e *Envelope, s data.Store) {
 	case DELETE:
 		go del(e, s)
 	case SYNC:
-		go syn(e, s)
+		go synchronize(e, s)
 	case ECHO:
 		go echo(e, s)
 	default:

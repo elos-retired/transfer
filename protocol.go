@@ -14,21 +14,6 @@ const (
 	ECHO   Action = "ECHO"
 )
 
-// Actions a server can send to a client
-var ServerActions = map[Action]bool{
-	POST:   true,
-	DELETE: true,
-}
-
-// Actions a client can send to a server
-var ClientActions = map[Action]bool{
-	POST:   true,
-	GET:    true,
-	DELETE: true,
-	SYNC:   true,
-	ECHO:   true,
-}
-
 // Inbound
 type Envelope struct {
 	Connection `json:"-"`
@@ -63,17 +48,5 @@ func NewPackage(a Action, data map[data.Kind]data.Record) *Package {
 	return &Package{
 		Action: a,
 		Data:   data,
-	}
-}
-
-/*
-	Returns a map like:
-	{ user: { Name: "Nick Landolfi"} }
-	of form:
-	{ <db.Kind>: <db.Model>}
-*/
-func Map(m data.Record) data.KindMap {
-	return data.KindMap{
-		m.Kind(): m,
 	}
 }
