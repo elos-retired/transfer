@@ -8,6 +8,9 @@ import (
 	"github.com/elos/models/user"
 )
 
+const AuthHeader = "Elos-Auth"
+const AuthDelimeter = "-"
+
 type Authenticator func(data.Store, *http.Request) (data.Client, bool, error)
 
 var Auth = func(extract func(*http.Request) (string, string)) Authenticator {
@@ -23,7 +26,7 @@ var Auth = func(extract func(*http.Request) (string, string)) Authenticator {
 }
 
 var HTTPCredentials = func(r *http.Request) (string, string) {
-	tokens := strings.Split(r.Header.Get("Elos-Auth"), "-")
+	tokens := strings.Split(r.Header.Get(AuthHeader), AuthDelimeter)
 
 	if len(tokens) != 2 {
 		return "", ""
@@ -33,7 +36,7 @@ var HTTPCredentials = func(r *http.Request) (string, string) {
 }
 
 var SocketCredentials = func(r *http.Request) (string, string) {
-	tokens := strings.Split(r.Header.Get("Sec-WebSocket-Protocol"), "-")
+	tokens := strings.Split(r.Header.Get(WebSocketProtocolHeader), AuthDelimeter)
 	// Query Parameter Method of Authentication
 	/*
 		id := r.FormValue("id")

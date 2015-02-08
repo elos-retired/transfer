@@ -1,11 +1,6 @@
 package transfer
 
-import (
-	"errors"
-	"github.com/elos/data"
-)
-
-var ConnectionClosedError = errors.New("SocketConnection is closed")
+import "github.com/elos/data"
 
 type JReader interface {
 	ReadJSON(interface{}) error
@@ -21,7 +16,7 @@ type AnonConnection interface {
 
 type Connection interface {
 	AnonConnection
-	Agent() data.Identifiable
+	data.Client
 }
 
 type AnonSocketConnection interface {
@@ -32,5 +27,5 @@ type AnonSocketConnection interface {
 
 type SocketConnection interface {
 	AnonSocketConnection
-	Agent() data.Identifiable
+	data.Client
 }

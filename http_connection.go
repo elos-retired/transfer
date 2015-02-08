@@ -1,7 +1,6 @@
 package transfer
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/elos/data"
@@ -10,14 +9,14 @@ import (
 type HTTPConnection struct {
 	w http.ResponseWriter
 	r *http.Request
-	a data.Identifiable
+	data.Client
 }
 
-func NewHTTPConnection(w http.ResponseWriter, r *http.Request, a data.Identifiable) *HTTPConnection {
+func NewHTTPConnection(w http.ResponseWriter, r *http.Request, c data.Client) *HTTPConnection {
 	return &HTTPConnection{
-		w: w,
-		r: r,
-		a: a,
+		w:      w,
+		r:      r,
+		Client: c,
 	}
 }
 
@@ -31,16 +30,7 @@ func (c *HTTPConnection) WriteJSON(v interface{}) error {
 
 	_, err = c.w.Write(bytes)
 
-	log.Print("Hasdfasdfd")
 	return err
-}
-
-func (c *HTTPConnection) Agent() data.Identifiable {
-	return c.a
-}
-
-func (c *HTTPConnection) IsAuthenticated() bool {
-	return c.Agent() != nil
 }
 
 func (c *HTTPConnection) NotFound() {
@@ -74,4 +64,8 @@ func (c *HTTPConnection) WriteErrorResponse(apiError *Error) {
 func (c *HTTPConnection) WriteResourceResponse(w http.ResponseWriter, status int, resource interface{}) {
 	w.WriteHeader(status)
 	WriteJSON(w, resource)
+}
+
+func (c *HTTPConnection) Upgrade(u WebSocketUpgrader) (SocketConnection, error) {
+	return u.Upgrade(c.w, c.r, c.Client)
 }

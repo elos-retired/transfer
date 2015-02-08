@@ -1,9 +1,12 @@
 package transfer
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 )
+
+var ErrConnectionClosed = errors.New("SocketConnection is closed")
 
 type Error struct {
 	Status           int    `json:"status"`

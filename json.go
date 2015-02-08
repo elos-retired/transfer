@@ -5,13 +5,16 @@ import (
 	"net/http"
 )
 
+const ContentTypeHeader = "Content-Type"
+const JSONContentType = "application/json; charset=utf-8"
+
 func ToJSON(v interface{}) ([]byte, error) {
 	// Always pretty-print JSON
 	return json.MarshalIndent(v, "", "    ")
 }
 
 func SetContentJSON(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set(ContentTypeHeader, JSONContentType)
 }
 
 /*
