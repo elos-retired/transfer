@@ -5,19 +5,24 @@ import (
 	"testing"
 
 	"github.com/elos/data"
+	"github.com/elos/models/user"
 )
 
 // the only valid one is at index 0
 var cPerms = []string{"id-key", "", "asdf-asdf-asdf-", "---", "askdfj-"}
 
 func TestAuth(t *testing.T) {
+	passAuth := true
 	c := func(*http.Request) (string, string, bool) {
-		return "id", "key", true
+		return "id", "key", passAuth
 	}
 
 	Authenticate = func(s data.Store, id string, key string) (data.Client, bool, error) {
 		return data.AnonClient, true, nil
 	}
+	defer func() {
+		Authenticate = user.Authenticate
+	}()
 
 	r, err := http.NewRequest("GET", "http://localhost:8000", nil)
 	if err != nil {
@@ -27,6 +32,16 @@ func TestAuth(t *testing.T) {
 	client, ok, err := Auth(c)(data.NewNullStore(), r)
 	if client != data.AnonClient || !ok || err != nil {
 		t.Errorf("Things did not configure correctly")
+	}
+
+	passAuth = false
+
+	client, ok, err = Auth(c)(data.NewNullStore(), r)
+	if ok {
+		t.Errorf("Auth should fail as Authenticate returns false now")
+	}
+	if err != ErrMalformedCredentials {
+		t.Errorf("Auth should return err malformed credentials")
 	}
 }
 
