@@ -13,39 +13,49 @@ const AuthDelimeter = "-"
 
 type Authenticator func(data.Store, *http.Request) (data.Client, bool, error)
 
-var Auth = func(credentials Credentialer) Authenticator {
+var Auth = func(credentialer Credentialer) Authenticator {
 	return func(s data.Store, r *http.Request) (data.Client, bool, error) {
-		id, key, ok := credentials(r)
+		id, key, ok := credentialer(r)
 		if !ok {
-			return nil, false, ErrCredentialsMalformed
+			return nil, false, ErrMalformedCredentials
 		}
 
-		return user.Authenticate(s, id, key)
+		return Authenticate(s, id, key)
 	}
 }
+
+var Authenticate = user.Authenticate
 
 type Credentialer func(*http.Request) (string, string, bool)
 
-var HTTPCredentialer = func(r *http.Request) (string, string, bool) {
-	tokens := strings.Split(r.Header.Get(AuthHeader), AuthDelimeter)
+var HTTPCredentialer = credentialer(httpTokens)
+var SocketCredentialer = credentialer(socketTokens)
 
-	if len(tokens) != 2 {
-		return "", "", false
-	} else {
-		return tokens[0], tokens[1], true
+func credentialer(t tokenizer) Credentialer {
+	return func(r *http.Request) (id string, key string, ok bool) {
+		tokens := t(r)
+
+		if len(tokens) < 2 || len(tokens) > 2 {
+			return
+		}
+
+		id = tokens[0]
+		key = tokens[1]
+
+		if id != "" && key != "" {
+			ok = true
+		}
+
+		return
 	}
 }
 
-var SocketCredentialer = func(r *http.Request) (string, string, bool) {
-	tokens := strings.Split(r.Header.Get(WebSocketProtocolHeader), AuthDelimeter)
-	// Query Parameter Method of Authentication
-	/*
-		id := r.FormValue("id")
-		key := r.FormValue("key")
-	*/
-	if len(tokens) != 2 {
-		return "", "", false
-	} else {
-		return tokens[0], tokens[1], true
-	}
+type tokenizer func(*http.Request) []string
+
+func httpTokens(r *http.Request) []string {
+	return strings.Split(r.Header.Get(AuthHeader), AuthDelimeter)
+}
+
+func socketTokens(r *http.Request) []string {
+	return strings.Split(r.Header.Get(WebSocketProtocolHeader), AuthDelimeter)
 }

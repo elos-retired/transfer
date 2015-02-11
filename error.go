@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-var ErrCredentialsMalformed = errors.New("credentials malformed")
+var ErrMalformedCredentials = errors.New("credentials malformed")
 var ErrConnectionClosed = errors.New("SocketConnection is closed")
 
 type Error struct {

@@ -1,4 +1,4 @@
-package transfer_test
+package transfer
 
 import (
 	"net/http"
@@ -8,7 +8,6 @@ import (
 
 	"github.com/elos/data"
 	"github.com/elos/models/user"
-	. "github.com/elos/transfer"
 )
 
 func TestWebSocketDefinitions(t *testing.T) {

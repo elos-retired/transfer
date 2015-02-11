@@ -1,11 +1,9 @@
-package transfer_test
+package transfer
 
 import (
 	"encoding/json"
 	"net/http/httptest"
 	"testing"
-
-	. "github.com/elos/transfer"
 )
 
 func TestToJSON(t *testing.T) {
