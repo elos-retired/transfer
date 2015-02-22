@@ -4,7 +4,7 @@ import "github.com/elos/data"
 
 // GET {{{
 
-var GetRoute = func(e *Envelope, a *data.Access) {
+var GetRoute = func(e *Envelope, a data.Access) {
 	for kind, info := range e.Data {
 		m, err := a.Unmarshal(kind, info)
 		if err != nil {
@@ -33,7 +33,7 @@ var GetRoute = func(e *Envelope, a *data.Access) {
 
 // POST {{{
 
-var PostRoute = func(e *Envelope, a *data.Access) {
+var PostRoute = func(e *Envelope, a data.Access) {
 	for kind, attrs := range e.Data {
 		m, err := a.Unmarshal(kind, attrs)
 		if err != nil {
@@ -42,7 +42,7 @@ var PostRoute = func(e *Envelope, a *data.Access) {
 		}
 
 		if !m.ID().Valid() {
-			m.SetID(a.Store.NewID())
+			m.SetID(a.NewID())
 		}
 
 		if err = a.Save(m); err != nil {
@@ -72,7 +72,7 @@ var PostRoute = func(e *Envelope, a *data.Access) {
 	Unsuccessful removal prompts a direct POST response
 	containing the record in question
 */
-var DeleteRoute = func(e *Envelope, a *data.Access) {
+var DeleteRoute = func(e *Envelope, a data.Access) {
 	for kind, info := range e.Data {
 		m, err := a.Unmarshal(kind, info)
 		if err != nil {
@@ -99,7 +99,7 @@ var DeleteRoute = func(e *Envelope, a *data.Access) {
 
 // ECHO {{{
 
-var EchoRoute = func(e *Envelope, a *data.Access) {
+var EchoRoute = func(e *Envelope, a data.Access) {
 	e.WriteJSON(e)
 }
 
@@ -107,7 +107,7 @@ var EchoRoute = func(e *Envelope, a *data.Access) {
 
 // SYNC {{{
 
-var SyncRoute = func(e *Envelope, a *data.Access) {
+var SyncRoute = func(e *Envelope, a data.Access) {
 	// not implemented
 }
 

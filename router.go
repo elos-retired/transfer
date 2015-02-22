@@ -5,7 +5,7 @@ import (
 )
 
 type Router interface {
-	Route(e *Envelope, s *data.Access)
+	Route(e *Envelope, s data.Access)
 }
 
 type ActionRouter struct {
@@ -18,7 +18,7 @@ func NewActionRouter() *ActionRouter {
 	}
 }
 
-func (r *ActionRouter) Route(e *Envelope, a *data.Access) {
+func (r *ActionRouter) Route(e *Envelope, a data.Access) {
 	// Overrides
 	router, ok := r.actions[e.Action]
 	if ok {
@@ -45,6 +45,6 @@ func (r *ActionRouter) Route(e *Envelope, a *data.Access) {
 
 var DefaultRouter = NewActionRouter()
 
-func Route(e *Envelope, a *data.Access) {
+func Route(e *Envelope, a data.Access) {
 	DefaultRouter.Route(e, a)
 }
