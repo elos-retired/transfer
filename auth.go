@@ -30,6 +30,7 @@ type Credentialer func(*http.Request) (string, string, bool)
 
 var HTTPCredentialer = credentialer(httpTokens)
 var SocketCredentialer = credentialer(socketTokens)
+var FormCredentialer = credentialer(formValues)
 
 func credentialer(t tokenizer) Credentialer {
 	return func(r *http.Request) (id string, key string, ok bool) {
@@ -58,4 +59,8 @@ func httpTokens(r *http.Request) []string {
 
 func socketTokens(r *http.Request) []string {
 	return strings.Split(r.Header.Get(WebSocketProtocolHeader), AuthDelimeter)
+}
+
+func formValues(r *http.Request) []string {
+	return []string{r.FormValue("id"), r.FormValue("key")}
 }
