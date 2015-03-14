@@ -6,10 +6,14 @@ import (
 
 	"github.com/elos/data"
 	"github.com/elos/models/user"
+	"github.com/gorilla/sessions"
 )
 
 const AuthHeader = "Elos-Auth"
+const AuthSession = "elos-auth"
 const AuthDelimeter = "-"
+const ID = "id"
+const Key = "key"
 
 type Authenticator func(data.Store, *http.Request) (data.Client, bool, error)
 
@@ -31,6 +35,30 @@ type Credentialer func(*http.Request) (string, string, bool)
 var HTTPCredentialer = credentialer(httpTokens)
 var SocketCredentialer = credentialer(socketTokens)
 var FormCredentialer = credentialer(formValues)
+
+func NewCookieCredentialer(s sessions.Store) Credentialer {
+	return credentialer(func(r *http.Request) []string {
+		session, _ := s.Get(r, AuthSession)
+		var (
+			id  string
+			key string
+		)
+
+		if idVal, ok := session.Values[ID]; ok {
+			if _, ok = idVal.(string); ok {
+				id = idVal.(string)
+			}
+		}
+
+		if keyVal, ok := session.Values[Key]; ok {
+			if _, ok = keyVal.(string); ok {
+				key = keyVal.(string)
+			}
+		}
+
+		return []string{id, key}
+	})
+}
 
 func credentialer(t tokenizer) Credentialer {
 	return func(r *http.Request) (id string, key string, ok bool) {
@@ -62,5 +90,5 @@ func socketTokens(r *http.Request) []string {
 }
 
 func formValues(r *http.Request) []string {
-	return []string{r.FormValue("id"), r.FormValue("key")}
+	return []string{r.FormValue(ID), r.FormValue(Key)}
 }
