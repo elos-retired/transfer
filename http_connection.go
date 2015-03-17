@@ -9,14 +9,14 @@ import (
 type HTTPConnection struct {
 	w http.ResponseWriter
 	r *http.Request
-	data.Client
+	data.Access
 }
 
-func NewHTTPConnection(w http.ResponseWriter, r *http.Request, c data.Client) *HTTPConnection {
+func NewHTTPConnection(w http.ResponseWriter, r *http.Request, a data.Access) *HTTPConnection {
 	return &HTTPConnection{
 		w:      w,
 		r:      r,
-		Client: c,
+		Access: a,
 	}
 }
 
@@ -67,5 +67,13 @@ func (c *HTTPConnection) WriteResourceResponse(w http.ResponseWriter, status int
 }
 
 func (c *HTTPConnection) Upgrade(u WebSocketUpgrader) (SocketConnection, error) {
-	return u.Upgrade(c.w, c.r, c.Client)
+	return u.Upgrade(c.w, c.r, c.Client())
+}
+
+func (c *HTTPConnection) ResponseWriter() http.ResponseWriter {
+	return c.w
+}
+
+func (c *HTTPConnection) Request() *http.Request {
+	return c.r
 }

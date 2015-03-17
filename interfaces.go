@@ -16,7 +16,6 @@ type AnonConnection interface {
 
 type Connection interface {
 	AnonConnection
-	data.Client
 }
 
 type AnonSocketConnection interface {
